@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b0c11">
+<title>עמית אוזן — תיק עבודות</title>
+<style>
+html,body{margin:0;min-height:100%;background:#0b0c11;color:#f5f5f5;font-family:Arial,sans-serif}
+body{display:grid;place-items:center;min-height:100vh}
+#status{text-align:center;padding:32px;line-height:1.8}
+#status small{display:block;color:#aaa;margin-top:8px}
+</style>
+</head>
+<body>
+<div id="status">טוען את תיק העבודות של עמית אוזן…<small>העמוד נבנה. זה עשוי לקחת כמה שניות.</small></div>
+<script>
+(async()=>{
+  const total=20, parts=[];
+  const status=document.getElementById("status");
+  try{
+    for(let i=1;i<=total;i++){
+      const name="part-"+String(i).padStart(3,"0")+".txt";
+      const response=await fetch(new URL("portfolio-parts/"+name,location.href),{cache:"no-store"});
+      if(!response.ok) throw new Error("טעינת מקטע "+i+" נכשלה ("+response.status+")");
+      parts.push(await response.text());
+      status.firstChild.textContent="טוען את תיק העבודות… "+i+" מתוך "+total;
+    }
+    const html=parts.join("");
+    if(!html.trimStart().toLowerCase().startsWith("<!doctype html>") || !html.trimEnd().toLowerCase().endsWith("</html>")) throw new Error("קובץ תיק העבודות לא התקבל במלואו");
+    document.open();
+    document.write(html);
+    document.close();
+  }catch(error){
+    status.innerHTML="לא הצלחנו לטעון את תיק העבודות.<small>"+String(error.message||error)+"</small><small>נסה לרענן את העמוד בעוד דקה.</small>";
+  }
+})();
+</script>
+</body>
+</html>
